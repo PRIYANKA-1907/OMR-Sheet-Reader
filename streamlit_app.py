@@ -1,5 +1,3 @@
-# src/webapp/streamlit_app.py
-
 import streamlit as st
 from PIL import Image
 import numpy as np
@@ -18,7 +16,7 @@ st.title("OMR Sheet Reader - Extract Answers from Sheet")
 uploaded_file = st.file_uploader("Upload OMR Sheet Image (jpg/png)", type=["jpg", "jpeg", "png"])
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded OMR Sheet", use_column_width=True)
+    st.image(image, caption="Uploaded OMR Sheet", use_container_width=True)
 
     # Convert PIL Image to OpenCV format
     image_np = np.array(image)
@@ -28,13 +26,12 @@ if uploaded_file:
     # Preprocess Image
     # ------------------------------
     processed_img, thresh = preprocess_image(image_cv)
-
-    st.image(thresh, caption="Thresholded Image", use_column_width=True)
+    st.image(thresh, caption="Thresholded Image", use_container_width=True)
 
     # ------------------------------
     # Detect & Classify Bubbles
     # ------------------------------
-    detected_bubbles = classify_bubbles(thresh, questions=40, options=4)  # Adjust as needed
+    detected_bubbles = classify_bubbles(thresh, questions=40, options=4)  # Adjust questions/options as per sheet
 
     # ------------------------------
     # Map Bubbles to Answers
@@ -50,7 +47,7 @@ if uploaded_file:
         st.write(f"**{subject}**: {answers}")
 
     # ------------------------------
-    # Example: Calculate Score
+    # Calculate Score
     # ------------------------------
     answer_key = {
         "Math": ['1','2','3','4','1','2','3','4','1','2','3','4','1','2','3','4','1','2','3','4'],

@@ -3,11 +3,20 @@
 import cv2
 import numpy as np
 
-def preprocess_image(image_path):
+def preprocess_image(image):
     """
-    Read an image and return the original and thresholded version.
+    Preprocess an OMR image.
+    Accepts:
+        - image: str (file path) or NumPy array (OpenCV image)
+    Returns:
+        - original image (BGR)
+        - thresholded image
     """
-    img = cv2.imread(image_path)
+    if isinstance(image, str):
+        img = cv2.imread(image)
+    else:
+        img = image  # Already a NumPy array (OpenCV image)
+    
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     thresh = cv2.adaptiveThreshold(
@@ -20,7 +29,7 @@ def preprocess_image(image_path):
 def detect_bubbles(thresh_img, questions=20, options=4):
     """
     Detect filled bubbles in thresholded image.
-    Returns a list of selected option per question as '1', '2', '3', or '4'.
+    Returns a list of selected options as strings ('1', '2', '3', '4').
     """
     contours, _ = cv2.findContours(
         thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
@@ -29,7 +38,7 @@ def detect_bubbles(thresh_img, questions=20, options=4):
     bubble_contours = []
     for c in contours:
         area = cv2.contourArea(c)
-        if 100 < area < 2000:  # adjust based on bubble size
+        if 100 < area < 2000:  # Adjust based on bubble size
             bubble_contours.append(c)
 
     # Sort top-to-bottom, left-to-right

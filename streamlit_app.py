@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
-from src.omr.omr_utils import preprocess_omr, detect_bubbles, classify_bubbles, map_to_answers
+# In streamlit_app.py
+from src.omr.omr_utils import preprocess_image, detect_bubbles, classify_bubbles, map_to_answers
 
 # ------------------------------
 # Streamlit App Config

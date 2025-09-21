@@ -1,15 +1,21 @@
+# src/omr/omr_utils.py
+
 import cv2
 import numpy as np
 
 def preprocess_image(image_path):
+    """
+    Read an image and return the original and thresholded version.
+    """
     img = cv2.imread(image_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     thresh = cv2.adaptiveThreshold(
-        blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+        blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
         cv2.THRESH_BINARY_INV, 25, 15
     )
     return img, thresh
+
 
 def detect_bubbles(thresh_img, questions=20, options=4):
     """
@@ -50,6 +56,29 @@ def detect_bubbles(thresh_img, questions=20, options=4):
         answers.append(str(filled + 1))  # '1', '2', '3', or '4'
     
     return answers
+
+
+def classify_bubbles(thresh_img, questions=20, options=4):
+    """
+    Wrapper to detect bubbles, same as detect_bubbles.
+    """
+    return detect_bubbles(thresh_img, questions, options)
+
+
+def map_to_answers(detected_bubbles, layout):
+    """
+    Map detected bubble answers to subjects based on layout.
+    layout: dict with subject name and number of questions
+    Example:
+        layout = {"Math": 20, "Science": 20}
+    """
+    answers = {}
+    idx = 0
+    for subject, q_count in layout.items():
+        answers[subject] = detected_bubbles[idx: idx + q_count]
+        idx += q_count
+    return answers
+
 
 def calculate_score(extracted_answers, answer_key):
     """
